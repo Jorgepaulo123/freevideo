@@ -120,11 +120,20 @@ async def download_file(filename: str):
     for platform in ['instagram', 'facebook', 'x', 'tiktok']:
         file_path = DOWNLOAD_DIR / platform / filename
         if file_path.exists():
+            # Configurar o callback para deletar o arquivo após o download
+            def cleanup():
+                try:
+                    os.remove(str(file_path))
+                    print(f"Arquivo {filename} deletado com sucesso")
+                except Exception as e:
+                    print(f"Erro ao deletar arquivo {filename}: {str(e)}")
+
             return FileResponse(
                 path=str(file_path),
                 filename=filename,
                 media_type='application/octet-stream',
-                headers={"Content-Disposition": f"attachment; filename={filename}"}
+                headers={"Content-Disposition": f"attachment; filename={filename}"},
+                background=cleanup  # FastAPI executará esta função após enviar o arquivo
             )
     
     # Se o arquivo não for encontrado em nenhuma pasta

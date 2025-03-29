@@ -3,6 +3,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pytube import YouTube
 import instaloader
 import yt_dlp as youtube_dl
@@ -26,6 +27,9 @@ DOWNLOAD_DIR.mkdir(exist_ok=True)
 (DOWNLOAD_DIR / 'facebook').mkdir(exist_ok=True)
 (DOWNLOAD_DIR / 'x').mkdir(exist_ok=True)
 (DOWNLOAD_DIR / 'tiktok').mkdir(exist_ok=True)
+
+# Mount static files directory
+app.mount("/files", StaticFiles(directory=str(DOWNLOAD_DIR)), name="downloads")
 
 @app.get('/download/tiktok')
 def download_tiktok(url: str):

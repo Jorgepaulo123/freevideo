@@ -113,6 +113,26 @@ def download_x(url: str):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+@app.get('/download/{filename}')
+async def download_file(filename: str):
+    """Download endpoint for converted files"""
+    # Procurar o arquivo em todas as pastas de download
+    for platform in ['instagram', 'facebook', 'x', 'tiktok']:
+        file_path = DOWNLOAD_DIR / platform / filename
+        if file_path.exists():
+            return FileResponse(
+                path=str(file_path),
+                filename=filename,
+                media_type='application/octet-stream',
+                headers={"Content-Disposition": f"attachment; filename={filename}"}
+            )
+    
+    # Se o arquivo não for encontrado em nenhuma pasta
+    raise HTTPException(
+        status_code=404,
+        detail="Arquivo não encontrado ou expirado"
+    )
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8080))  # Padrão da Render é 10000, não 8000
